@@ -76,6 +76,11 @@
         "id": "8685507ed33c029a5787275e9f3ea2b133d45d25",
         "address": "prysm-rpc.validatorvn.com:44656",
         "provider": "ValidatorVN"
+      },
+      {
+        "id": "e3156873994bfbb1999bbf6e4a1ad9cb2f14139e",
+        "address": "seed-prysm.j-node.net:29656",
+        "provider": "JosephTran"
       }
     ],
     "persistent_peers": [
@@ -83,6 +88,11 @@
         "id": "b377fd0b14816eef8e12644340845c127d1e7d93",
         "address": "dns.kleomed.es:26656",
         "provider": "Kleomedes"
+      },
+      {
+        "id": "01306d268a332b0032bf01939443e8d3c80473b6",
+        "address": "peer-prysm.josephtran.xyz:25656",
+        "provider": "JosephTran"
       }
     ]
   },
@@ -103,6 +113,10 @@
       {
         "address": "https://prysm-rpc.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://rpc-prysm.josephtran.xyz/",
+        "provider": "JosephTran"
       }
     ],
     "rest": [
@@ -121,6 +135,10 @@
       {
         "address": "https://prysm-api.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://api-prysm.josephtran.xyz/",
+        "provider": "JosephTran"
       }
     ],
     "grpc": [
@@ -135,6 +153,10 @@
       {
         "address": "prysm-grpc.validatorvn.com:44090",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://grpc-prysm.josephtran.xyz/",
+        "provider": "JosephTran"
       }
     ]
   },
