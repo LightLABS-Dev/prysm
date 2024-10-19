@@ -76,6 +76,11 @@
         "id": "8685507ed33c029a5787275e9f3ea2b133d45d25",
         "address": "prysm-rpc.validatorvn.com:44656",
         "provider": "ValidatorVN"
+      },
+      {
+        "id": "2a880ac5961c7b0c0341e163c5aa223e726ee07e",
+        "address": "rpc-prysm.ongtrong.xyz:29656",
+        "provider": "LexisNexis"
       }
     ],
     "persistent_peers": [
@@ -103,6 +108,10 @@
       {
         "address": "https://prysm-rpc.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://rpc-prysm.ongtrong.xyz/",
+        "provider": "LexisNexis"
       }
     ],
     "rest": [
@@ -121,6 +130,10 @@
       {
         "address": "https://prysm-api.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://api-prysm.ongtrong.xyz/",
+        "provider": "LexisNexis"
       }
     ],
     "grpc": [
@@ -135,6 +148,10 @@
       {
         "address": "prysm-grpc.validatorvn.com:44090",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "prysm-grpc.ongtrong.xyz:50052",
+        "provider": "LexisNexis"
       }
     ]
   },
