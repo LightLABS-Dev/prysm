@@ -103,6 +103,10 @@
       {
         "address": "https://prysm-rpc.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+        {
+        "address": "https://rpc-prysm.coha05.com/",
+        "provider": "Coha05 | Spider Node"
       }
     ],
     "rest": [
@@ -121,6 +125,10 @@
       {
         "address": "https://prysm-api.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+        {
+        "address": "https://api-prysm.coha05.com/",
+        "provider": "Coha05 | Spider Node"
       }
     ],
     "grpc": [
@@ -144,6 +152,12 @@
       "url": "https://explorer.kleomedes.network/prysm",
       "tx_page": "https://explorer.kleomedes.network/prysm/tx/${txHash}",
       "account_page": "https://explorer.kleomedes.network/prysm/account/${accountAddress}"
+    },
+      {
+      "kind": "PingPub",
+      "url": "https://explorer.tech-coha05.xyz/Prysm",
+      "tx_page": "https://explorer.tech-coha05.xyz/Prysm/tx/${txHash}",
+      "account_page": "https://explorer.tech-coha05.xyz/Prysm/account/${accountAddress}"
     }
   ],
   "images": [
