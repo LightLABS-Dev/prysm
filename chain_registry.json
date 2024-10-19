@@ -111,6 +111,10 @@
         "provider": "Kleomedes"
       },
       {
+        "address": "https://prysm-testnet-api.validator247.com/",
+        "provider": "Validator247"
+      },
+      {
         "address": "https://prysm-testnet-api.polkachu.com/",
         "provider": "Polkachu"
       },
