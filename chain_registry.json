@@ -83,6 +83,11 @@
         "id": "b377fd0b14816eef8e12644340845c127d1e7d93",
         "address": "dns.kleomed.es:26656",
         "provider": "Kleomedes"
+      },
+      {
+        "id": "22b6d4f817ed345b7ac4e736715a985d8ee75004",
+        "address": "prysm-testnet-peers.mictonode.com:33656",
+        "provider": "MictoNode"
       }
     ]
   },
@@ -103,6 +108,10 @@
       {
         "address": "https://prysm-rpc.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://prysm-testnet-rpc.mictonode.com/",
+        "provider": "MictoNode"
       }
     ],
     "rest": [
@@ -121,6 +130,10 @@
       {
         "address": "https://prysm-api.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://prysm-testnet-api.mictonode.com/",
+        "provider": "MictoNode"
       }
     ],
     "grpc": [
@@ -135,6 +148,10 @@
       {
         "address": "prysm-grpc.validatorvn.com:44090",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://prysm-testnet-grpc.mictonode.com:443",
+        "provider": "MictoNode"
       }
     ]
   },
@@ -144,6 +161,12 @@
       "url": "https://explorer.kleomedes.network/prysm",
       "tx_page": "https://explorer.kleomedes.network/prysm/tx/${txHash}",
       "account_page": "https://explorer.kleomedes.network/prysm/account/${accountAddress}"
+    },
+    {
+      "kind": "PingPub",
+      "url": "https://explorer.mictonode.com/Prysm-Testnet",
+      "tx_page": "https://explorer.mictonode.com/Prysm-Testnet/tx/${txHash}",
+      "account_page": "https://explorer.mictonode.com/Prysm-Testnet/account/${accountAddress}"
     }
   ],
   "images": [
