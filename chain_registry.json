@@ -103,6 +103,10 @@
       {
         "address": "https://prysm-rpc.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://rpc-prysm.stringlabs.xyz/",
+        "provider": "StringLabs"
       }
     ],
     "rest": [
@@ -121,6 +125,10 @@
       {
         "address": "https://prysm-api.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://api-prysm.stringlabs.xyz/",
+        "provider": "StringLabs"
       }
     ],
     "grpc": [
@@ -144,6 +152,12 @@
       "url": "https://explorer.kleomedes.network/prysm",
       "tx_page": "https://explorer.kleomedes.network/prysm/tx/${txHash}",
       "account_page": "https://explorer.kleomedes.network/prysm/account/${accountAddress}"
+    },
+    {
+      "kind": "PingPub",
+      "url": "https://explorer.stringlabs.xyz/prysm-testnet",
+      "tx_page": "https://explorer.stringlabs.xyz/prysm-testnet/tx/${txHash}",
+      "account_page": "https://explorer.stringlabs.xyz/prysm-testnet/account/${accountAddress}"
     }
   ],
   "images": [
