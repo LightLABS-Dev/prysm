@@ -117,6 +117,10 @@
       {
         "address": "https://prysm-testnet-rpc.itrocket.net/",
         "provider": "ITRocket"
+      },
+      {
+        "address": "https://t-prysm.rpc.utsa.tech/",
+        "provider": "UTSA"
       }
     ],
     "rest": [
@@ -139,6 +143,10 @@
       {
         "address": "https://prysm-testnet-api.itrocket.net/",
         "provider": "ITRocket"
+      },
+      {
+        "address": "https://t-prysm.api.utsa.tech/",
+        "provider": "UTSA"
       }
     ],
     "grpc": [
@@ -172,6 +180,12 @@
       "url": "https://testnet.itrocket.net/prysm",
       "tx_page": "https://testnet.itrocket.net/prysm/tx/${txHash}",
       "account_page": "https://testnet.itrocket.net/prysm/account/${accountAddress}"
+    },
+    {
+      "kind": "UTSA",
+      "url": "https://exp.utsa.tech/prysm-test",
+      "tx_page": "https://exp.utsa.tech/prysm-test/tx/${txHash}",
+      "account_page": "https://exp.utsa.tech/prysm-test/account/${accountAddress}"
     }
   ],
   "images": [
