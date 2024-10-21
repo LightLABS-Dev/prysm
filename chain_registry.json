@@ -117,6 +117,10 @@
       {
         "address": "https://prysm-testnet-rpc.itrocket.net/",
         "provider": "ITRocket"
+      },
+      {
+        "address": "https://rpc.prysm-testnet.stake-take.com/",
+        "provider": "Stake-Take"
       }
     ],
     "rest": [
@@ -139,6 +143,10 @@
       {
         "address": "https://prysm-testnet-api.itrocket.net/",
         "provider": "ITRocket"
+      },
+      {
+        "address": "https://api.prysm-testnet.stake-take.com/",
+        "provider": "Stake-Take"
       }
     ],
     "grpc": [
@@ -172,6 +180,12 @@
       "url": "https://testnet.itrocket.net/prysm",
       "tx_page": "https://testnet.itrocket.net/prysm/tx/${txHash}",
       "account_page": "https://testnet.itrocket.net/prysm/account/${accountAddress}"
+    },
+    {
+      "kind": "Stake-Take",
+      "url": "https://explorer.stake-take.com/prysm-testnet",
+      "tx_page": "https://explorer.stake-take.com/prysm-testnet/tx/${txHash}",
+      "account_page": "https://explorer.stake-take.com/prysm-testnet/account/${accountAddress}"
     }
   ],
   "images": [
