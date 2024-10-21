@@ -115,6 +115,10 @@
         "provider": "ValidatorVN"
       },
       {
+        "address": "https://t-prysm.rpc.utsa.tech/",
+        "provider": "UTSA"
+      },
+      {
         "address": "https://prysm-testnet-rpc.itrocket.net/",
         "provider": "ITRocket"
       }
@@ -135,6 +139,10 @@
       {
         "address": "https://prysm-api.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://t-prysm.api.utsa.tech/",
+        "provider": "UTSA"
       },
       {
         "address": "https://prysm-testnet-api.itrocket.net/",
@@ -166,6 +174,12 @@
       "url": "https://explorer.kleomedes.network/prysm",
       "tx_page": "https://explorer.kleomedes.network/prysm/tx/${txHash}",
       "account_page": "https://explorer.kleomedes.network/prysm/account/${accountAddress}"
+    },
+    {
+      "kind": "UTSA",
+      "url": "https://exp.utsa.tech/prysm-test",
+      "tx_page": "https://exp.utsa.tech/prysm-test/tx/${txHash}",
+      "account_page": "https://exp.utsa.tech/prysm-test/account/${accountAddress}"
     },
     {
       "kind": "ITRocket",
