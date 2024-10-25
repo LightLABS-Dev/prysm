@@ -76,6 +76,11 @@
         "id": "8685507ed33c029a5787275e9f3ea2b133d45d25",
         "address": "prysm-rpc.validatorvn.com:44656",
         "provider": "ValidatorVN"
+      },
+        {
+        "id": "bb1fab58aaf4c81d3d3412331285bffb52968208",
+        "address": "prysm-rpc.node9x.com:15656",
+        "provider": "Chicharito | Node9X"
       }
     ],
     "persistent_peers": [
@@ -103,6 +108,10 @@
       {
         "address": "https://prysm-rpc.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://prysm-rpc.node9x.com/",
+        "provider": "Chicharito | Node9X"
       }
     ],
     "rest": [
@@ -121,6 +130,10 @@
       {
         "address": "https://prysm-api.validatorvn.com/",
         "provider": "ValidatorVN"
+      },
+      {
+        "address": "https://prysm-api.node9x.com/",
+        "provider": "Chicharito | Node9X"
       }
     ],
     "grpc": [
@@ -144,6 +157,12 @@
       "url": "https://explorer.kleomedes.network/prysm",
       "tx_page": "https://explorer.kleomedes.network/prysm/tx/${txHash}",
       "account_page": "https://explorer.kleomedes.network/prysm/account/${accountAddress}"
+    },
+    {
+      "kind": "PingPub",
+      "url": "https://explorer.node9x.com/prysm",
+      "tx_page": "https://explorer.node9x.com/prysm/tx/${txHash}",
+      "account_page": "https://explorer.node9x.com/prysm/account/${accountAddress}"
     }
   ],
   "images": [
