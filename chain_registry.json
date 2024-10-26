@@ -78,6 +78,16 @@
         "provider": "ValidatorVN"
       },
       {
+        "id": "2a880ac5961c7b0c0341e163c5aa223e726ee07e",
+        "address": "rpc-prysm.ongtrong.xyz:29656",
+        "provider": "LexisNexis"
+     },
+      {
+        "id": "e3156873994bfbb1999bbf6e4a1ad9cb2f14139e",
+        "address": "seed-prysm.j-node.net:29656",
+        "provider": "JosephTran"
+       },
+       {
         "id": "1b5b6a532e24c91d1bc4491a6b989581f5314ea5",
         "address": "prysm-testnet-seed.itrocket.net:25656",
         "provider": "ITRocket"
@@ -90,9 +100,39 @@
         "provider": "Kleomedes"
       },
       {
+        "id": "ca9e8d35f654aa44a99d36d47120495a82530f1a",
+        "address": "prysm-t.peer.stavr.tech:13256",
+        "provider": "🔥STAVR🔥"
+     },
+      {
+        "id": "271fe43e9a393cc47e288e80aa5b1ec1452fa0e7",
+        "address": "88.99.149.170:29656",
+        "provider": "Vinjan.Inc"  
+     },
+      {
+        "id": "22b6d4f817ed345b7ac4e736715a985d8ee75004",
+        "address": "prysm-testnet-peers.mictonode.com:33656",
+        "provider": "MictoNode"
+      },
+      {
+        "id": "01306d268a332b0032bf01939443e8d3c80473b6",
+        "address": "peer-prysm.josephtran.xyz:25656",
+        "provider": "JosephTran"
+      },
+      {
         "id": "ff15df83487e4aa8d2819452063f336269958d09",
         "address": "prysm-testnet-peer.itrocket.net:25657",
         "provider": "ITRocket"
+      },
+      {
+        "id": "4a88c4925f887325872451659e554aafebdb026d",
+        "address": "prysm-testnet.sychonix.com:19756",
+        "provider": "Sychonix"
+      },
+      {
+        "id": "1c69efcfe639d663378bb02f679307876c18fca2",
+        "address": "prysm-testnet-rpc.peer.stingray.plus:26616",
+        "provider": "StingRay"
       }
     ]
   },
@@ -111,12 +151,56 @@
         "provider": "Synergy Nodes"
       },
       {
+        "address": "https://prysm.rpc.t.stavr.tech/",
+        "provider": "🔥STAVR🔥"
+      },
+      {
         "address": "https://prysm-rpc.validatorvn.com/",
         "provider": "ValidatorVN"
       },
       {
+        "address": "https://t-prysm.rpc.utsa.tech/",
+        "provider": "UTSA"
+      },
+      {
+        "address": "https://rpc-prysm.stringlabs.xyz/",
+        "provider": "StringLabs"
+     },
+      {
+        "address": "https://rpc-prysm.vinjan.xyz/",
+        "provider": "Vinjan.Inc"  
+     },
+      {
+        "address": "https://rpc-prysm.ongtrong.xyz/",
+        "provider": "LexisNexis"
+     },
+      {
+        "address": "https://prysm-testnet-rpc.mictonode.com/",
+        "provider": "MictoNode"
+      },
+      {
+        "address": "https://rpc-prysm.coha05.com/",
+        "provider": "Coha05 | Spider Node"
+      },
+      {
+        "address": "https://prysm-testnet-rpc.validator247.com/",
+        "provider": "Validator247"
+      },
+      {
+        "address": "https://rpc-prysm.josephtran.xyz/",
+        "provider": "JosephTran"
+      },
+      {
         "address": "https://prysm-testnet-rpc.itrocket.net/",
         "provider": "ITRocket"
+      },
+      {
+        "address": "https://rpc-prysm-t.sychonix.com/",
+        "provider": "Sychonix"
+      },
+      {
+        "address": "https://rpc.prysm-testnet.stake-take.com/",
+        "provider": "Stake-Take"
       }
     ],
     "rest": [
@@ -129,6 +213,14 @@
         "provider": "Polkachu"
       },
       {
+        "address": "https://prysm.api.t.stavr.tech/",
+        "provider": "🔥STAVR🔥"
+     },
+      {
+        "address": "https://prysm-testnet-api.stingray.plus/",
+        "provider": "StingRay"
+      },
+      {
         "address": "https://prysm-testnet-api.synergynodes.com/",
         "provider": "Synergy Nodes"
       },
@@ -137,8 +229,48 @@
         "provider": "ValidatorVN"
       },
       {
+        "address": "https://t-prysm.api.utsa.tech/",
+        "provider": "UTSA"
+      },
+      {
+        "address": "https://api-prysm.stringlabs.xyz/",
+        "provider": "StringLabs"
+     },
+      {
+        "address": "https://api-prysm.vinjan.xyz/",
+        "provider": "Vinjan.Inc"  
+     },
+      {
+        "address": "https://api-prysm.ongtrong.xyz/",
+        "provider": "LexisNexis"
+     },
+      {
+        "address": "https://prysm-testnet-api.mictonode.com/",
+        "provider": "MictoNode"
+      },
+      {
+        "address": "https://api-prysm.coha05.com/",
+        "provider": "Coha05 | Spider Node"
+      },
+      {
+        "address": "https://prysm-testnet-api.validator247.com/",
+        "provider": "Validator247"
+      },
+      {
+        "address": "https://api-prysm.josephtran.xyz/",
+        "provider": "JosephTran"
+      },
+      {
         "address": "https://prysm-testnet-api.itrocket.net/",
         "provider": "ITRocket"
+      },
+      {
+        "address": "https://api-prysm-t.sychonix.com/",
+        "provider": "Sychonix"
+      },
+      {
+        "address": "https://api.prysm-testnet.stake-take.com/",
+        "provider": "Stake-Take"
       }
     ],
     "grpc": [
@@ -151,9 +283,29 @@
         "provider": "Synergy Nodes"
       },
       {
+        "address": "prysm.grpc.t.stavr.tech:3790",
+        "provider": "🔥STAVR🔥"
+      },
+      {
         "address": "prysm-grpc.validatorvn.com:44090",
         "provider": "ValidatorVN"
       },
+      {
+        "address": "https://grpc-prysm.vinjan.xyz:29090",
+        "provider": "Vinjan.Inc"  
+     },
+      {
+        "address": "prysm-grpc.ongtrong.xyz:50052",
+        "provider": "LexisNexis"
+     },
+      {
+        "address": "https://prysm-testnet-grpc.mictonode.com:443",
+        "provider": "MictoNode"
+      },
+      {
+        "address": "https://grpc-prysm.josephtran.xyz/",
+        "provider": "JosephTran"
+       },
       {
         "address": "prysm-testnet-grpc.itrocket.net:443",
         "provider": "ITRocket"
@@ -168,10 +320,56 @@
       "account_page": "https://explorer.kleomedes.network/prysm/account/${accountAddress}"
     },
     {
+      "kind": "UTSA",
+      "url": "https://exp.utsa.tech/prysm-test",
+      "tx_page": "https://exp.utsa.tech/prysm-test/tx/${txHash}",
+      "account_page": "https://exp.utsa.tech/prysm-test/account/${accountAddress}"
+    },
+    {
+      "kind": "🔥STAVR🔥",
+      "url": "https://explorer.stavr.tech/Prysm-Testnet",
+      "tx_page": "https://explorer.stavr.tech/Prysm-Testnet/tx/${txHash}",
+      "account_page": "https://explorer.stavr.tech/Prysm-Testnet/account/${accountAddress}"
+     },
+      {
+      "kind": "PingPub",
+      "url": "https://explorer.stringlabs.xyz/prysm-testnet",
+      "tx_page": "https://explorer.stringlabs.xyz/prysm-testnet/tx/${txHash}",
+      "account_page": "https://explorer.stringlabs.xyz/prysm-testnet/account/${accountAddress}"
+     },
+      {
+      "kind": "PingPub",
+      "url": "https://xplorer.vinjan.xyz/prysm-testnet",
+      "tx_page": "https://xplorer.vinjan.xyz/prysm-testnet/tx/${txHash}",
+      "account_page": "https://xplorer.vinjan.xyz/prysm-testnet/account/${accountAddress}"  
+      },
+      {
+      "url": "https://explorer.mictonode.com/Prysm-Testnet",
+      "tx_page": "https://explorer.mictonode.com/Prysm-Testnet/tx/${txHash}",
+      "account_page": "https://explorer.mictonode.com/Prysm-Testnet/account/${accountAddress}"
+      },
+      {
+      "url": "https://explorer.tech-coha05.xyz/Prysm",
+      "tx_page": "https://explorer.tech-coha05.xyz/Prysm/tx/${txHash}",
+      "account_page": "https://explorer.tech-coha05.xyz/Prysm/account/${accountAddress}"
+      },
+      {
       "kind": "ITRocket",
       "url": "https://testnet.itrocket.net/prysm",
       "tx_page": "https://testnet.itrocket.net/prysm/tx/${txHash}",
       "account_page": "https://testnet.itrocket.net/prysm/account/${accountAddress}"
+    },
+    {
+      "kind": "PingPub",
+      "url": "https://explorer.sychonix.com/prysm-testnet",
+      "tx_page": "https://explorer.sychonix.com/prysm-testnet/tx/${txHash}",
+      "account_page": "https://explorer.sychonix.com/prysm-testnet/account/${accountAddress}"
+      },
+      {
+      "kind": "Stake-Take",
+      "url": "https://explorer.stake-take.com/prysm-testnet",
+      "tx_page": "https://explorer.stake-take.com/prysm-testnet/tx/${txHash}",
+      "account_page": "https://explorer.stake-take.com/prysm-testnet/account/${accountAddress}"
     }
   ],
   "images": [
