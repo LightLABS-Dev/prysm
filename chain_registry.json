@@ -93,11 +93,6 @@
         "id": "ff15df83487e4aa8d2819452063f336269958d09",
         "address": "prysm-testnet-peer.itrocket.net:25657",
         "provider": "ITRocket"
-      },
-      {
-        "id": "1c69efcfe639d663378bb02f679307876c18fca2",
-        "address": "prysm-testnet-rpc.peer.stingray.plus:26616",
-        "provider": "StingRay"
       }
     ]
   },
@@ -110,10 +105,6 @@
       {
         "address": "https://prysm-testnet-rpc.polkachu.com/",
         "provider": "Polkachu"
-      },
-      {
-        "address": "https://prysm-testnet-rpc.stingray.plus/",
-        "provider": "StingRay"
       },
       {
         "address": "https://prysm-testnet-rpc.synergynodes.com/",
@@ -136,10 +127,6 @@
       {
         "address": "https://prysm-testnet-api.polkachu.com/",
         "provider": "Polkachu"
-      },
-      {
-        "address": "https://prysm-testnet-api.stingray.plus/",
-        "provider": "StingRay"
       },
       {
         "address": "https://prysm-testnet-api.synergynodes.com/",
@@ -170,12 +157,6 @@
       {
         "address": "prysm-testnet-grpc.itrocket.net:443",
         "provider": "ITRocket"
-      }
-    ],
-     "wss": [
-      {
-        "address": "wss://prysm-testnet-rpc.stingray.plus/websocket",
-        "provider": "StingRay"
       }
     ]
   },
