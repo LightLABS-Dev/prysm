@@ -96,7 +96,12 @@
         "id": "df949a46ae6529ae1e09b034b49716468d5cc7e9",
         "address": "testnet-seeds.stakerhouse.com:14256",
         "provider": "StakerHouse"
-     }
+     },
+      {
+        "id": "bb1fab58aaf4c81d3d3412331285bffb52968208",
+        "address": "prysm-rpc.node9x.com:15656 ",
+        "provider": "Chicharito | Node 9X"
+      }
     ],
     "persistent_peers": [
       {
@@ -224,6 +229,10 @@
         "address": "https://prysm-testnet-rpc.stakerhouse.com",
         "provider": "StakerHouse"
       },
+      {
+        "address": "https://prysm-rpc.node9x.com",
+        "provider": "Chicharito | Node 9X"
+      }
     ],
     "rest": [
       {
@@ -301,6 +310,10 @@
       {
         "address": "https://prysm-testnet-rest.stakerhouse.com",
         "provider": "StakerHouse"
+      },
+      {
+        "address": "https://prysm-api.node9x.com",
+        "provider": "Chicharito | Node 9X"
       }
     ],
     "grpc": [
@@ -351,6 +364,10 @@
       {
         "address": "https://prysm-testnet-grpc.stingray.plus:443",
         "provider": "StingRay"
+      },
+      {
+        "address": "https://prysm-grpc.node9x.com:443",
+        "provider": "Chicharito | Node 9X"
       }
     ],
      "wss": [
@@ -361,6 +378,10 @@
       {
         "address": "wss://prysm-testnet-rpc.cogwheel.zone/websocket",
         "provider": "Cogwheel ⚙️"
+      },
+        {
+        "address": "wss://prysm-rpc.node9x.com/websocket",
+        "provider": "Chicharito | Node 9X"
       }
     ],
   },
@@ -428,6 +449,12 @@
       "url": "https://testnet.cosmotracker.com/prysm",
       "tx_page": "https://testnet.cosmotracker.com/prysm/tx/${txHash}",
       "account_page": "https://testnet.cosmotracker.com/prysm/account/${accountAddress}"
+    },
+    {
+      "kind": "Chicharito | Node 9x",
+      "url": "hhttps://explorer.node9x.com/prysm",
+      "tx_page": "https://explorer.node9x.com/prysm/tx/${txHash}",
+      "account_page": "https://explorer.node9x.com/prysm/account/${accountAddress}"
     }
   ],
   "images": [
