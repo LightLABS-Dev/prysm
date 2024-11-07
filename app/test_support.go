@@ -10,7 +10,12 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	ibcproviderkeeper "github.com/cosmos/interchain-security/v6/x/ccv/provider/keeper"
 )
+
+func (app *ChainApp) GetProviderKeeper() ibcproviderkeeper.Keeper {
+	return app.ProviderKeeper
+}
 
 func (app *ChainApp) GetIBCKeeper() *ibckeeper.Keeper {
 	return app.IBCKeeper
