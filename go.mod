@@ -6,8 +6,6 @@ go 1.22.3
 replace (
 	cosmossdk.io/core => cosmossdk.io/core v0.11.0
 	github.com/cosmos/cosmos-sdk => github.com/rollchains/cosmos-sdk v0.50.8
-
-	github.com/cosmos/interchain-security/v6 => /home/reece/Desktop/Programming/Go/interchain-security
 	github.com/spf13/viper => github.com/spf13/viper v1.17.0 // v1.18+ breaks app overrides
 )
 
