@@ -493,15 +493,7 @@ func NewChainApp(
 		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ValidatorAddrPrefix()),
 		authcodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
 	)
-	app.MintKeeper = mintkeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(keys[minttypes.StoreKey]),
-		app.ProviderKeeper,
-		app.AccountKeeper,
-		app.BankKeeper,
-		authtypes.FeeCollectorName,
-		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
-	)
+
 	app.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(keys[distrtypes.StoreKey]),
@@ -605,6 +597,16 @@ func NewChainApp(
 		authtypes.FeeCollectorName,
 	)
 
+	app.MintKeeper = mintkeeper.NewKeeper(
+		appCodec,
+		runtime.NewKVStoreService(keys[minttypes.StoreKey]),
+		app.ProviderKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+	)
+
 	// register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper.SetHooks(
@@ -638,9 +640,6 @@ func NewChainApp(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	// Set legacy router for backwards compatibility with gov v1beta1
-	govKeeper.SetLegacyRouter(govRouter)
-
 	// Set gov on provider
 	app.ProviderKeeper.SetGovKeeper(*govKeeper)
 	app.ProviderModule = icsprovider.NewAppModule(
@@ -648,6 +647,9 @@ func NewChainApp(
 		app.GetSubspace(providertypes.ModuleName),
 		app.keys[providertypes.StoreKey],
 	)
+
+	// Set legacy router for backwards compatibility with gov v1beta1
+	govKeeper.SetLegacyRouter(govRouter)
 
 	app.GovKeeper = govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
