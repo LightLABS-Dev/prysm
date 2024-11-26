@@ -39,7 +39,7 @@ type ConsumerConfig struct {
 }
 
 var (
-	icsPath = "ics-path"
+	// icsPath = "ics-path"
 	// cd testing/consumer && DOCKER_BUILDKIT=0 docker build . --tag consumer:local
 	ConsumerTestingChainSpec = interchaintest.ChainSpec{
 		Name:          "ics-consumer",
@@ -50,8 +50,8 @@ var (
 			TrustingPeriod: "504h",
 			Type:           "cosmos",
 			// Name:           "consumer",
-			ChainID:      "ics-consumer-1",
-			Bin:          "interchain-security-cdd", // consumer daemon democracy has staking, thus allowing proper genutils
+			ChainID: "ics-consumer-1", // chainID := fmt.Sprintf("%s-%d", config.ChainName, len(p.Consumers)+1)
+			// Bin:          "interchain-security-cdd", // consumer daemon democracy has staking, thus allowing proper genutils
 			Denom:        "stake",
 			Bech32Prefix: "consumer",
 			// GasPrices:      "0.0" + "utoken",
@@ -64,6 +64,7 @@ var (
 				cosmos.NewGenesisKV("app_state.gov.params.max_deposit_period", MaxDepositPeriod),
 				cosmos.NewGenesisKV("app_state.gov.params.min_deposit.0.denom", Denom),
 				cosmos.NewGenesisKV("app_state.gov.params.min_deposit.0.amount", "1"),
+				cosmos.NewGenesisKV("app_state.ccvconsumer.params.soft_opt_out_threshold", "0.0"), // if config.TopN >= 0
 			}),
 		},
 	}
@@ -119,8 +120,8 @@ func TestICSConnection(t *testing.T) {
 	})
 
 	// Add consumer chain after the startup
-	spawnTime := time.Now().Add(time.Second * 30) // too long?
-	chainID := fmt.Sprintf("%s-%d", ConsumerTestingChainSpec.ChainName, 2)
+	spawnTime := time.Now().Add(time.Second * 10)
+	chainID := ConsumerTestingChainSpec.ChainConfig.ChainID
 
 	consumerCfg := ConsumerConfig{
 		ChainName:         ConsumerTestingChainSpec.Name,
@@ -129,6 +130,7 @@ func TestICSConnection(t *testing.T) {
 		TopN:              100,
 		AllowInactiveVals: true,
 		MinStake:          1_000_000,
+		spec:              &ConsumerTestingChainSpec,
 	}
 
 	err = CreateConsumerPermissionless(ctx, provider, chainID, consumerCfg, spawnTime)
@@ -136,7 +138,7 @@ func TestICSConnection(t *testing.T) {
 
 	cf = interchaintest.NewBuiltinChainFactory(
 		zaptest.NewLogger(t),
-		[]*interchaintest.ChainSpec{&ConsumerTestingChainSpec},
+		[]*interchaintest.ChainSpec{consumerCfg.spec},
 	)
 	chains2, err := cf.Chains(provider.GetNode().TestName)
 	require.NoError(t, err)
@@ -145,7 +147,7 @@ func TestICSConnection(t *testing.T) {
 	cosmosConsumer := chains2[0].(*cosmos.CosmosChain)
 	// consumers := []*cosmos.CosmosChain{cosmosConsumer}
 
-	relayerWallet, err := cosmosConsumer.BuildRelayerWallet(ctx, "relayer-"+cosmosConsumer.Config().ChainID)
+	relayerWallet, err := cosmosConsumer.BuildRelayerWallet(ctx, "relayer-"+chainID)
 	require.NoError(t, err)
 
 	wallets := make([]ibc.Wallet, len(provider.Validators)+1)
@@ -175,6 +177,18 @@ func TestICSConnection(t *testing.T) {
 	require.NoError(t, err)
 
 	// setup chain keys, stop & start relayer, then connect provider <> consumer
+	for i, val := range cosmosConsumer.Validators {
+		err := val.RecoverKey(ctx, "validator", wallets[i+1].Mnemonic())
+		require.NoError(t, err)
+	}
+	// consumer, err := chainFromCosmosChain(cosmosConsumer, relayerWallet)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// err = relayer.SetupChainKeys(ctx, consumer)
+	require.NoError(t, r.StopRelayer(ctx, eRep))
+	require.NoError(t, r.StartRelayer(ctx, eRep))
+	// connectProviderConsumer(ctx, p, consumer, relayer)
 
 	// manual stuff
 
