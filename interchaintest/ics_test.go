@@ -43,7 +43,7 @@ var (
 	// cd testing/consumer && DOCKER_BUILDKIT=0 docker build . --tag consumer:local
 	ConsumerTestingChainSpec = interchaintest.ChainSpec{
 		Name:          "ics-consumer",
-		Version:       "v6.0.0",
+		Version:       "v6.2.0",
 		NumValidators: &vals, NumFullNodes: &fNodes,
 		ChainConfig: ibc.ChainConfig{
 			GasAdjustment:  3.0,
@@ -51,7 +51,7 @@ var (
 			Type:           "cosmos",
 			// Name:           "consumer",
 			ChainID:      "ics-consumer-1",
-			Bin:          "interchain-security-cd",
+			Bin:          "interchain-security-cdd", // consumer daemon democracy has staking, thus allowing proper genutils
 			Denom:        "stake",
 			Bech32Prefix: "consumer",
 			// GasPrices:      "0.0" + "utoken",
