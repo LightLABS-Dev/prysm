@@ -1199,7 +1199,6 @@ func (app *ChainApp) FinalizeBlock(req *abci.RequestFinalizeBlock) (*abci.Respon
 
 	return app.BaseApp.FinalizeBlock(req)
 }
-
 func (app *ChainApp) setPostHandler() {
 	postHandler, err := posthandler.NewPostHandler(
 		posthandler.HandlerOptions{},

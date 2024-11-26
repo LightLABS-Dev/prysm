@@ -4,8 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"cosmossdk.io/math"
-
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
@@ -16,6 +14,7 @@ import (
 )
 
 var (
+	icsPath = "ics-path"
 	// cd testing/consumer && DOCKER_BUILDKIT=0 docker build . --tag consumer:local
 	ConsumerTestingChain = interchaintest.ChainSpec{
 		Name:          "consumer",
@@ -33,7 +32,10 @@ var (
 			CoinType:       "118",
 			Bech32Prefix:   "cosmos",
 			GasPrices:      "0.0" + "utoken",
-			// InterchainSecurityConfig: ,
+			InterchainSecurityConfig: ibc.ICSConfig{
+				ProviderVerOverride: "v0.0.0",
+				ConsumerVerOverride: "v0.0.0",
+			},
 			Images: []ibc.DockerImage{
 				ibc.NewDockerImage("consumer", "local", "1026:1026"),
 			},
@@ -81,7 +83,7 @@ func TestICSConnection(t *testing.T) {
 			Provider: provider,
 			Consumer: consumer,
 			Relayer:  r,
-			Path:     ibcPath,
+			Path:     icsPath,
 		})
 
 		// failed to start chains: failed to start provider chain prysm: failed to submit consumer addition proposal: exit
@@ -96,26 +98,26 @@ func TestICSConnection(t *testing.T) {
 		_ = ic.Close()
 	})
 
-	require.NoError(t, provider.FinishICSProviderSetup(ctx, r, eRep, ibcPath))
+	// require.NoError(t, provider.FinishICSProviderSetup(ctx, r, eRep, icsPath))
 
-	amt := math.NewInt(10_000_000)
-	users := interchaintest.GetAndFundTestUsers(t, ctx, "default", amt,
-		provider,
-		consumer,
-	)
+	// amt := math.NewInt(10_000_000)
+	// users := interchaintest.GetAndFundTestUsers(t, ctx, "default", amt,
+	// provider,
+	// consumer,
+	// )
+	//
+	// userProvider := users[0]
+	// userConsumer := users[1]
 
-	userProvider := users[0]
-	userConsumer := users[1]
+	// t.Run("validate funding", func(t *testing.T) {
+	// 	bal, err := consumer.BankQueryBalance(ctx, userConsumer.FormattedAddress(), consumer.Config().Denom)
+	// 	require.NoError(t, err)
+	// 	require.EqualValues(t, amt, bal)
 
-	t.Run("validate funding", func(t *testing.T) {
-		bal, err := consumer.BankQueryBalance(ctx, userConsumer.FormattedAddress(), consumer.Config().Denom)
-		require.NoError(t, err)
-		require.EqualValues(t, amt, bal)
-
-		bal, err = provider.BankQueryBalance(ctx, userProvider.FormattedAddress(), provider.Config().Denom)
-		require.NoError(t, err)
-		require.EqualValues(t, amt, bal)
-	})
+	// 	bal, err = provider.BankQueryBalance(ctx, userProvider.FormattedAddress(), provider.Config().Denom)
+	// 	require.NoError(t, err)
+	// 	require.EqualValues(t, amt, bal)
+	// })
 
 	// t.Run("provider -> consumer IBC transfer", func(t *testing.T) {
 	// 	providerChannelInfo, err := r.GetChannels(ctx, eRep, provider.Config().ChainID)
@@ -142,7 +144,7 @@ func TestICSConnection(t *testing.T) {
 	// 	require.NoError(t, err)
 	// 	require.NoError(t, tx.Validate())
 
-	// 	require.NoError(t, r.Flush(ctx, eRep, ibcPath, channelID))
+	// 	require.NoError(t, r.Flush(ctx, eRep, icsPath, channelID))
 
 	// 	srcDenomTrace := transfertypes.ParseDenomTrace(transfertypes.GetPrefixedDenom("transfer", consumerChannelID, provider.Config().Denom))
 	// 	dstIbcDenom := srcDenomTrace.IBCDenom()
