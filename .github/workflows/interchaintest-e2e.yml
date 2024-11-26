@@ -55,6 +55,8 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # TODO: build testing/consumer image and/or load directly
+
       - name: Build and export
         uses: docker/build-push-action@v5
         with:
@@ -81,6 +83,7 @@ jobs:
           - "ictest-packetforward"
           - "ictest-tokenfactory"
           - "ictest-ratelimit"
+          - "ictest-ics"
       fail-fast: false
 
     steps:

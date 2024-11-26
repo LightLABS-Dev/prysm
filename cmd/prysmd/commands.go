@@ -121,7 +121,7 @@ func initRootCmd(
 		server.StatusCommand(),
 		genesisCommand(txConfig, basicManager),
 		queryCommand(),
-		txCommand(),
+		txCommand(basicManager),
 		keys.Commands(),
 	)
 }
@@ -163,7 +163,7 @@ func queryCommand() *cobra.Command {
 	return cmd
 }
 
-func txCommand() *cobra.Command {
+func txCommand(basicManager module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "tx",
 		Short:                      "Transactions subcommands",
@@ -183,6 +183,10 @@ func txCommand() *cobra.Command {
 		authcmd.GetDecodeCommand(),
 		authcmd.GetSimulateCmd(),
 	)
+
+	// NOTE: this must be registered for now so that submit-legacy-proposal
+	// message (e.g. consumer-addition proposal) can be routed to the its handler and processed correctly.
+	basicManager.AddTxCommands(cmd)
 
 	return cmd
 }

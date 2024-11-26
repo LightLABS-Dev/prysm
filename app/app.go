@@ -155,6 +155,7 @@ import (
 
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/gov"
+	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 
 	no_valupdates_genutil "github.com/cosmos/interchain-security/v6/x/ccv/no_valupdates_genutil"
 	no_valupdates_staking "github.com/cosmos/interchain-security/v6/x/ccv/no_valupdates_staking"
@@ -640,14 +641,6 @@ func NewChainApp(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	// Set gov on provider
-	app.ProviderKeeper.SetGovKeeper(*govKeeper)
-	app.ProviderModule = icsprovider.NewAppModule(
-		&app.ProviderKeeper,
-		app.GetSubspace(providertypes.ModuleName),
-		app.keys[providertypes.StoreKey],
-	)
-
 	// Set legacy router for backwards compatibility with gov v1beta1
 	govKeeper.SetLegacyRouter(govRouter)
 
@@ -655,6 +648,14 @@ func NewChainApp(
 		govtypes.NewMultiGovHooks(
 			app.ProviderKeeper.Hooks(),
 		),
+	)
+
+	// Set gov on provider
+	app.ProviderKeeper.SetGovKeeper(*app.GovKeeper)
+	app.ProviderModule = icsprovider.NewAppModule(
+		&app.ProviderKeeper,
+		app.GetSubspace(providertypes.ModuleName),
+		app.keys[providertypes.StoreKey],
 	)
 
 	app.NFTKeeper = nftkeeper.NewKeeper(
@@ -935,7 +936,13 @@ func NewChainApp(
 	app.BasicModuleManager = module.NewBasicManagerFromManager(
 		app.ModuleManager,
 		map[string]module.AppModuleBasic{
-			genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
+			genutiltypes.ModuleName:  genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
+			providertypes.ModuleName: app.ProviderModule,
+			govtypes.ModuleName: gov.NewAppModuleBasic(
+				[]govclient.ProposalHandler{
+					// paramsclient.ProposalHandler,
+				},
+			),
 		})
 	app.BasicModuleManager.RegisterLegacyAminoCodec(legacyAmino)
 	app.BasicModuleManager.RegisterInterfaces(interfaceRegistry)

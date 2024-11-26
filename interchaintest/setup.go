@@ -14,9 +14,12 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	govv1types "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	govv1beta1types "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm/types"
 	ibcconntypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
+	providertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
 	tokenfactory "github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 )
 
@@ -45,7 +48,8 @@ var (
 		// tokenfactory: set create cost in set denom or in gas usage.
 		cosmos.NewGenesisKV("app_state.tokenfactory.params.denom_creation_fee", nil),
 		cosmos.NewGenesisKV("app_state.tokenfactory.params.denom_creation_gas_consume", 1), // cost 1 gas to create a new denom
-
+		// v4+ ICS provider required
+		cosmos.NewGenesisKV("app_state.provider.params.blocks_per_epoch", "1"),
 	}
 
 	DefaultChainConfig = ibc.ChainConfig{
@@ -99,6 +103,9 @@ func GetEncodingConfig() *moduletestutil.TestEncodingConfig {
 	// TODO: add encoding types here for the modules you want to use
 	wasm.RegisterInterfaces(cfg.InterfaceRegistry)
 	tokenfactory.RegisterInterfaces(cfg.InterfaceRegistry)
+	providertypes.RegisterInterfaces(cfg.InterfaceRegistry)
+	govv1beta1types.RegisterInterfaces(cfg.InterfaceRegistry)
+	govv1types.RegisterInterfaces(cfg.InterfaceRegistry)
 	return &cfg
 }
 
