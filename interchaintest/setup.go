@@ -50,6 +50,8 @@ var (
 		cosmos.NewGenesisKV("app_state.tokenfactory.params.denom_creation_gas_consume", 1), // cost 1 gas to create a new denom
 		// v4+ ICS provider required
 		cosmos.NewGenesisKV("app_state.provider.params.blocks_per_epoch", "1"),
+		cosmos.NewGenesisKV("app_state.provider.params.slash_meter_replenish_period", "2s"),
+		cosmos.NewGenesisKV("app_state.provider.params.slash_meter_replenish_fraction", "1.00"),
 	}
 
 	DefaultChainConfig = ibc.ChainConfig{
