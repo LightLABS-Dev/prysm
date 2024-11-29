@@ -44,8 +44,6 @@ const (
 	ChainSpawnWait         = 155 * time.Second
 	SlashingWindowConsumer = 20
 	BlocksPerDistribution  = 10
-	StrideVersion          = "v22.0.0"
-	NeutronVersion         = "v3.0.2"
 	TransferPortID         = "transfer"
 	// This is needed because not every ics image is in the default heighliner registry
 	HyphaICSRepo = "ghcr.io/hyphacoop/ics"

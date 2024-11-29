@@ -20,18 +20,20 @@ type ConsumerLaunchSuite struct {
 }
 
 func TestICS6Consumer(t *testing.T) {
+	numVals := chainsuite.TwoValidators
+
 	s := &ConsumerLaunchSuite{
 		Suite: chainsuite.NewSuite(chainsuite.SuiteConfig{
 			CreateRelayer: true,
 			ChainSpec: &interchaintest.ChainSpec{
-				NumValidators: &chainsuite.SixValidators,
+				NumValidators: &numVals,
 				ChainConfig:   e2e.DefaultChainConfig,
 			},
 		}),
 		OtherChain:                   "ics-consumer",
 		OtherChainVersionPreUpgrade:  "v6.2.1",
 		OtherChainVersionPostUpgrade: "v6.2.1",
-		ShouldCopyProviderKey:        noProviderKeysCopied(),
+		ShouldCopyProviderKey:        noProviderKeysCopied(numVals),
 	}
 	suite.Run(t, s)
 }
@@ -68,6 +70,10 @@ func (s *ConsumerLaunchSuite) TestChainLaunch() {
 	s.Require().NoError(chainsuite.SendSimpleIBCTx(s.GetContext(), s.Chain, consumer, s.Relayer))
 }
 
-func noProviderKeysCopied() []bool {
-	return []bool{false, false, false, false, false, false}
+func noProviderKeysCopied(numVals int) []bool {
+	ret := make([]bool, numVals)
+	for i := range ret {
+		ret[i] = false
+	}
+	return ret
 }
