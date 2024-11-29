@@ -23,7 +23,7 @@ replace (
 
 	// https://github.com/strangelove-ventures/interchaintest/pull/1236/files / // https://github.com/cosmos/interchain-security/blob/main/tests/interchain/go.mod#L280
 	// github.com/strangelove-ventures/interchaintest/v8 => github.com/hyphacoop/interchaintest/v8 v8.2.1-0.20240904201357-3a54d751e08d
-	github.com/strangelove-ventures/interchaintest/v8 => /home/reece/Desktop/Programming/Go/interchaintest
+	// github.com/strangelove-ventures/interchaintest/v8 => /home/reece/Desktop/Programming/Go/interchaintest
 	// github.com/strangelove-ventures/interchaintest/v8 => /home/reece/Desktop/Programming/Go/interchaintest
 
 	// other
@@ -39,7 +39,8 @@ require (
 	github.com/cosmos/interchain-security/v6 v6.3.0
 	github.com/docker/docker v24.0.9+incompatible
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/strangelove-ventures/interchaintest/v8 v8.8.0
+	// https://github.com/strangelove-ventures/interchaintest/pull/1306
+	github.com/strangelove-ventures/interchaintest/v8 v8.7.1-0.20241129221035-bdd9aa53dbdc
 	github.com/strangelove-ventures/tokenfactory v0.50.3
 	github.com/stretchr/testify v1.9.0
 	github.com/tidwall/gjson v1.18.0
