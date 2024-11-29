@@ -34,7 +34,7 @@ func GetProviderSpec() *interchaintest.ChainSpec {
 			},
 			Images: []ibc.DockerImage{{
 				Repository: ProviderImageName,
-				UIDGID:     "1025:1025",
+				UidGid:     "1025:1025",
 			}},
 			ModifyGenesis:        cosmos.ModifyGenesis(providerModifiedGenesis()),
 			ModifyGenesisAmounts: DefaultGenesisAmounts(Stake),
