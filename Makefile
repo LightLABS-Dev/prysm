@@ -251,7 +251,7 @@ endif
 ###############################################################################
 
 ictest-basic:
-	@echo "Running basic e2e test"
+	@echo "Running Basic e2e test"
 	@cd interchaintest && go test -race -v -run TestBasicChain .
 
 ictest-ibc:
@@ -260,19 +260,15 @@ ictest-ibc:
 
 ictest-ics:
 	@echo "Running ICS e2e test"
-	@cd interchaintest && go test -race -v -run TestICSConnection .
+	@cd interchaintest && go test -race -v -run TestICSProviderSuite ./integration
 
 ictest-wasm:
-	@echo "Running cosmwasm e2e test"
+	@echo "Running Cosmwasm e2e test"
 	@cd interchaintest && go test -race -v -run TestCosmWasmIntegration .
 
 ictest-packetforward:
-	@echo "Running packet forward middleware e2e test"
+	@echo "Running PacketForward e2e test"
 	@cd interchaintest && go test -race -v -run TestPacketForwardMiddleware .
-
-ictest-poa:
-	@echo "Running proof of authority e2e test"
-	@cd interchaintest && go test -race -v -run TestPOA .
 
 ictest-tokenfactory:
 	@echo "Running token factory e2e test"

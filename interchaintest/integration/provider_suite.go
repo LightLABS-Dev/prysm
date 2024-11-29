@@ -3,7 +3,7 @@ package e2e
 import (
 	"context"
 
-	"github.com/lightlabs-dev/prysm/interchaintest/chainsuite"
+	"github.com/lightlabs-dev/prysm/interchaintest/integration/chainsuite"
 
 	"github.com/stretchr/testify/suite"
 )

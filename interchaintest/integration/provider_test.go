@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/lightlabs-dev/prysm/interchaintest/chainsuite"
+	"github.com/lightlabs-dev/prysm/interchaintest/integration/chainsuite"
 
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	providertypes "github.com/cosmos/interchain-security/v6/x/ccv/provider/types"
@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-func TestProviderSuite(t *testing.T) {
+func TestICSProviderSuite(t *testing.T) {
 	s := &ProviderSuite{}
 
 	suite.Run(t, s)
