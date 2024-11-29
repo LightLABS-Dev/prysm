@@ -4,40 +4,39 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"path"
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
+	sdkmath "cosmossdk.io/math"
+	abci "github.com/cometbft/cometbft/abci/types"
+	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
+	providertypes "github.com/cosmos/interchain-security/v6/x/ccv/provider/types"
 	"github.com/strangelove-ventures/interchaintest/v8"
 	"github.com/strangelove-ventures/interchaintest/v8/chain/cosmos"
 	"github.com/strangelove-ventures/interchaintest/v8/ibc"
-	"github.com/strangelove-ventures/interchaintest/v8/testutil"
-	"github.com/tidwall/gjson"
 	"golang.org/x/sync/errgroup"
-
-	sdkmath "cosmossdk.io/math"
-	abcitypes "github.com/cometbft/cometbft/abci/types"
-	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 )
 
 // This moniker is hardcoded into interchaintest
-const validatorMoniker = "validator"
+const ValidatorMoniker = "validator"
+const TestMonikerPrefix = "testAccount"
 
 type Chain struct {
 	*cosmos.CosmosChain
 	ValidatorWallets []ValidatorWallet
 	RelayerWallet    ibc.Wallet
+	TestWallets      []ibc.Wallet
 }
 
 type ValidatorWallet struct {
 	Moniker        string
 	Address        string
 	ValoperAddress string
-	ValConsAddress string
 }
 
-func chainFromCosmosChain(cosmos *cosmos.CosmosChain, relayerWallet ibc.Wallet) (*Chain, error) {
+func chainFromCosmosChain(cosmos *cosmos.CosmosChain, relayerWallet ibc.Wallet, testWallets []ibc.Wallet) (*Chain, error) {
 	c := &Chain{CosmosChain: cosmos}
 	wallets, err := getValidatorWallets(context.Background(), c)
 	if err != nil {
@@ -45,11 +44,12 @@ func chainFromCosmosChain(cosmos *cosmos.CosmosChain, relayerWallet ibc.Wallet) 
 	}
 	c.ValidatorWallets = wallets
 	c.RelayerWallet = relayerWallet
+	c.TestWallets = testWallets
 	return c, nil
 }
 
-// CreateChain creates a single new chain with the given version and returns the chain object.
-func CreateChain(ctx context.Context, testName interchaintest.TestName, spec *interchaintest.ChainSpec) (*Chain, error) {
+// CreateProviderChain creates a single new chain with the given version and returns the chain object.
+func CreateProviderChain(ctx context.Context, testName interchaintest.TestName, spec *interchaintest.ChainSpec) (*Chain, error) {
 	cf := interchaintest.NewBuiltinChainFactory(
 		GetLogger(ctx),
 		[]*interchaintest.ChainSpec{spec},
@@ -60,6 +60,8 @@ func CreateChain(ctx context.Context, testName interchaintest.TestName, spec *in
 		return nil, err
 	}
 	cosmosChain := chains[0].(*cosmos.CosmosChain)
+
+	// build relayer wallet
 	relayerWallet, err := cosmosChain.BuildRelayerWallet(ctx, "relayer-"+cosmosChain.Config().ChainID)
 	if err != nil {
 		return nil, err
@@ -68,7 +70,7 @@ func CreateChain(ctx context.Context, testName interchaintest.TestName, spec *in
 	ic := interchaintest.NewInterchain().AddChain(cosmosChain, ibc.WalletAmount{
 		Address: relayerWallet.FormattedAddress(),
 		Denom:   cosmosChain.Config().Denom,
-		Amount:  sdkmath.NewInt(ValidatorFunds),
+		Amount:  sdkmath.NewInt(TotalValidatorFunds),
 	})
 
 	dockerClient, dockerNetwork := GetDockerContext(ctx)
@@ -81,22 +83,76 @@ func CreateChain(ctx context.Context, testName interchaintest.TestName, spec *in
 		return nil, err
 	}
 
-	chain, err := chainFromCosmosChain(cosmosChain, relayerWallet)
+	// build test wallets
+	testWallets, err := setupTestWallets(ctx, cosmosChain, TestWalletsNumber)
 	if err != nil {
 		return nil, err
 	}
+	chain, err := chainFromCosmosChain(cosmosChain, relayerWallet, testWallets)
+	if err != nil {
+		return nil, err
+	}
+
 	return chain, nil
 }
 
-func (c *Chain) GenerateTx(ctx context.Context, valIdx int, command ...string) (string, error) {
-	command = append([]string{"tx"}, command...)
-	command = append(command, "--generate-only", "--keyring-backend", "test", "--chain-id", c.Config().ChainID)
-	command = c.Validators[valIdx].NodeCommand(command...)
-	stdout, _, err := c.Validators[valIdx].Exec(ctx, command, nil)
-	if err != nil {
-		return "", err
+func setupTestWallets(ctx context.Context, cosmosChain *cosmos.CosmosChain, walletCount int) ([]ibc.Wallet, error) {
+	wallets := make([]ibc.Wallet, walletCount)
+	eg := new(errgroup.Group)
+	for i := 0; i < walletCount; i++ {
+		keyName := TestMonikerPrefix + strconv.Itoa(i)
+		wallet, err := cosmosChain.BuildWallet(ctx, keyName, "")
+		if err != nil {
+			return nil, err
+		}
+		wallets[i] = wallet
+		eg.Go(func() error {
+			return cosmosChain.SendFunds(ctx, interchaintest.FaucetAccountKeyName, ibc.WalletAmount{
+				Amount:  sdkmath.NewInt(int64(ValidatorFunds)),
+				Denom:   cosmosChain.Config().Denom,
+				Address: wallet.FormattedAddress(),
+			})
+		})
 	}
-	return string(stdout), nil
+	err := eg.Wait()
+	if err != nil {
+		return nil, err
+	}
+
+	return wallets, nil
+}
+
+func getValidatorWallets(ctx context.Context, chain *Chain) ([]ValidatorWallet, error) {
+	wallets := make([]ValidatorWallet, len(chain.Validators))
+	lock := new(sync.Mutex)
+	eg := new(errgroup.Group)
+	for i := 0; i < len(chain.Validators); i++ {
+		i := i
+		eg.Go(func() error {
+			// This moniker is hardcoded into the chain's genesis process.
+			moniker := ValidatorMoniker
+			address, err := chain.Validators[i].KeyBech32(ctx, moniker, "acc")
+			if err != nil {
+				return err
+			}
+			valoperAddress, err := chain.Validators[i].KeyBech32(ctx, moniker, "val")
+			if err != nil {
+				return err
+			}
+			lock.Lock()
+			defer lock.Unlock()
+			wallets[i] = ValidatorWallet{
+				Moniker:        moniker,
+				Address:        address,
+				ValoperAddress: valoperAddress,
+			}
+			return nil
+		})
+	}
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
+	return wallets, nil
 }
 
 func (c *Chain) WaitForProposalStatus(ctx context.Context, proposalID string, status govv1.ProposalStatus) error {
@@ -108,376 +164,291 @@ func (c *Chain) WaitForProposalStatus(ctx context.Context, proposalID string, st
 	if err != nil {
 		return err
 	}
-	// At 4s per block, 75 blocks is about 5 minutes.
-	maxHeight := chainHeight + 75
+	maxHeight := chainHeight + UpgradeDelta
 	_, err = cosmos.PollForProposalStatusV1(ctx, c.CosmosChain, chainHeight, maxHeight, uint64(propID), status)
 	return err
 }
 
-func (c *Chain) PassProposal(ctx context.Context, proposalID string) error {
+func (c *Chain) VoteForProposal(ctx context.Context, proposalID string, vote string) error {
 	propID, err := strconv.ParseInt(proposalID, 10, 64)
 	if err != nil {
 		return err
 	}
-	err = c.VoteOnProposalAllValidators(ctx, uint64(propID), cosmos.ProposalVoteYes)
-	if err != nil {
-		return err
-	}
-	return c.WaitForProposalStatus(ctx, proposalID, govv1.StatusPassed)
-}
-
-func (c *Chain) ReplaceImagesAndRestart(ctx context.Context, version string) error {
-	// bring down nodes to prepare for upgrade
-	err := c.StopAllNodes(ctx)
+	err = c.VoteOnProposalAllValidators(ctx, uint64(propID), vote)
 	if err != nil {
 		return err
 	}
 
-	// upgrade version on all nodes
-	c.UpgradeVersion(ctx, c.GetNode().DockerClient, c.GetNode().Image.Repository, version)
-
-	// start all nodes back up.
-	// validators reach consensus on first block after upgrade height
-	// and block production resumes.
-	err = c.StartAllNodes(ctx)
-	if err != nil {
-		return err
-	}
-
-	timeoutCtx, timeoutCancel := context.WithTimeout(ctx, 60*time.Second)
-	defer timeoutCancel()
-	err = testutil.WaitForBlocks(timeoutCtx, 5, c)
-	if err != nil {
-		return fmt.Errorf("failed to wait for blocks after upgrade: %w", err)
-	}
-
-	// Flush "successfully migrated key info" messages
-	for _, val := range c.Validators {
-		_, _, err := val.ExecBin(ctx, "keys", "list", "--keyring-backend", "test")
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 
-func (c *Chain) Upgrade(ctx context.Context, upgradeName, version string) error {
-	height, err := c.Height(ctx)
+func (c *Chain) SubmitAndVoteForProposal(ctx context.Context, prop cosmos.TxProposalv1, vote string) (string, error) {
+
+	propTx, err := c.SubmitProposal(ctx, ValidatorMoniker, prop)
+	if err != nil {
+		return "", err
+	}
+
+	if err := c.WaitForProposalStatus(ctx, propTx.ProposalID, govv1.StatusVotingPeriod); err != nil {
+		return "", err
+	}
+
+	if err := c.VoteForProposal(ctx, propTx.ProposalID, vote); err != nil {
+		return "", err
+	}
+
+	return propTx.ProposalID, nil
+}
+
+// builds proposal message, submits, votes and wait for proposal expected status
+func (c *Chain) ExecuteProposalMsg(ctx context.Context, proposalMsg cosmos.ProtoMessage, proposer string, chainName string, vote string, expectedStatus govv1.ProposalStatus, expedited bool) error {
+	proposal, err := c.BuildProposal([]cosmos.ProtoMessage{proposalMsg}, chainName, "summary", "", GovMinDepositString, proposer, false)
 	if err != nil {
 		return err
 	}
 
-	haltHeight := height + UpgradeDelta
-
-	proposal := cosmos.SoftwareUpgradeProposal{
-		Deposit:     GovDepositAmount, // greater than min deposit
-		Title:       "Upgrade to " + upgradeName,
-		Name:        upgradeName,
-		Description: "Upgrade to " + upgradeName,
-		Height:      haltHeight,
-	}
-	upgradeTx, err := c.UpgradeProposal(ctx, interchaintest.FaucetAccountKeyName, proposal)
-	if err != nil {
-		return err
-	}
-	if err := c.PassProposal(ctx, upgradeTx.ProposalID); err != nil {
-		return err
-	}
-
-	height, err = c.Height(ctx)
+	// submit and vote for the proposal
+	proposalId, err := c.SubmitAndVoteForProposal(ctx, proposal, vote)
 	if err != nil {
 		return err
 	}
 
-	// wait for the chain to halt. We're asking for blocks after the halt height, so we should time out.
-	timeoutCtx, timeoutCtxCancel := context.WithTimeout(ctx, (time.Duration(haltHeight-height)+10)*CommitTimeout)
-	defer timeoutCtxCancel()
-	err = testutil.WaitForBlocks(timeoutCtx, int(haltHeight-height)+3, c)
-	if err == nil {
-		return fmt.Errorf("chain should not produce blocks after halt height")
-	} else if timeoutCtx.Err() == nil {
-		return fmt.Errorf("chain should not produce blocks after halt height")
+	if err = c.WaitForProposalStatus(ctx, proposalId, expectedStatus); err != nil {
+		return err
 	}
 
-	height, err = c.Height(ctx)
+	return nil
+}
+
+func (c *Chain) CreateConsumer(ctx context.Context, msg *providertypes.MsgCreateConsumer, keyName string) (string, error) {
+	content, err := json.Marshal(msg)
+	if err != nil {
+		return "", err
+	}
+	jsonFile := "create-consumer.json"
+	if err = c.GetNode().WriteFile(ctx, content, jsonFile); err != nil {
+		return "", err
+	}
+
+	filePath := path.Join(c.GetNode().HomeDir(), jsonFile)
+	txHash, err := c.GetNode().ExecTx(ctx, keyName, "provider", "create-consumer", filePath)
+	if err != nil {
+		return "", err
+	}
+
+	response, err := c.GetNode().TxHashToResponse(ctx, txHash)
+	if err != nil {
+		return "", err
+	}
+
+	consumerId, found := getEvtAttribute(response.Events, providertypes.EventTypeCreateConsumer, providertypes.AttributeConsumerId)
+	if !found {
+		return "", fmt.Errorf("consumer id is not found")
+	}
+
+	return consumerId, err
+}
+
+func (c *Chain) UpdateConsumer(ctx context.Context, msg *providertypes.MsgUpdateConsumer, ownerKeyName string) error {
+	content, err := json.Marshal(msg)
+	if err != nil {
+		return err
+	}
+	jsonFile := "update-consumer.json"
+	if err = c.GetNode().WriteFile(ctx, content, jsonFile); err != nil {
+		return err
+	}
+
+	filePath := path.Join(c.GetNode().HomeDir(), jsonFile)
+
+	_, err = c.GetNode().ExecTx(ctx, ownerKeyName, "provider", "update-consumer", filePath)
 	if err != nil {
 		return err
 	}
 
-	// make sure that chain is halted; some chains may produce one more block after halt height
-	if height-haltHeight > 1 {
-		return fmt.Errorf("height %d is not within one block of halt height %d; chain isn't halted", height, haltHeight)
-	}
-
-	return c.ReplaceImagesAndRestart(ctx, version)
+	return err
 }
 
-func (c *Chain) GetValidatorPower(ctx context.Context, hexaddr string) (int64, error) {
-	var power int64
-	err := CheckEndpoint(ctx, c.GetHostRPCAddress()+"/validators", func(b []byte) error {
-		power = gjson.GetBytes(b, fmt.Sprintf("result.validators.#(address==\"%s\").voting_power", hexaddr)).Int()
-		if power == 0 {
-			return fmt.Errorf("validator %s power not found; validators are: %s", hexaddr, string(b))
-		}
-		return nil
-	})
-	if err != nil {
-		return 0, err
-	}
-	return power, nil
+func (c *Chain) RemoveConsumer(ctx context.Context, consumerId string, keyName string) error {
+	_, err := c.GetNode().ExecTx(ctx, keyName, "provider", "remove-consumer", consumerId)
+	return err
 }
 
-func (c *Chain) GetValidatorHex(ctx context.Context, val int) (string, error) {
-	json, err := c.Validators[val].ReadFile(ctx, "config/priv_validator_key.json")
-	if err != nil {
-		return "", err
-	}
-	providerHex := gjson.GetBytes(json, "address").String()
-	return providerHex, nil
+func (c *Chain) OptIn(ctx context.Context, consumerID string, valIndex int) error {
+	_, err := c.Validators[valIndex].ExecTx(ctx, ValidatorMoniker, "provider", "opt-in", consumerID)
+	return err
 }
 
-func getValidatorWallets(ctx context.Context, chain *Chain) ([]ValidatorWallet, error) {
-	wallets := make([]ValidatorWallet, len(chain.Validators))
-	lock := new(sync.Mutex)
-	eg := new(errgroup.Group)
-	for i := range chain.Validators {
-		i := i
-		eg.Go(func() error {
-			// This moniker is hardcoded into the chain's genesis process.
-			moniker := validatorMoniker
-			address, err := chain.Validators[i].KeyBech32(ctx, moniker, "acc")
-			if err != nil {
-				return err
-			}
-			valoperAddress, err := chain.Validators[i].KeyBech32(ctx, moniker, "val")
-			if err != nil {
-				return err
-			}
-			valCons, _, err := chain.Validators[i].ExecBin(ctx, "comet", "show-address")
-			if err != nil {
-				return err
-			}
-			lock.Lock()
-			defer lock.Unlock()
-			wallets[i] = ValidatorWallet{
-				Moniker:        moniker,
-				Address:        address,
-				ValoperAddress: valoperAddress,
-				ValConsAddress: strings.TrimSpace(string(valCons)),
-			}
-			return nil
-		})
-	}
-	if err := eg.Wait(); err != nil {
-		return nil, err
-	}
-	return wallets, nil
+func (c *Chain) OptOut(ctx context.Context, consumerID string, valIndex int) error {
+	_, err := c.Validators[valIndex].ExecTx(ctx, ValidatorMoniker, "provider", "opt-out", consumerID)
+	return err
 }
 
-func (c *Chain) QueryJSON(ctx context.Context, jsonPath string, query ...string) (gjson.Result, error) {
-	stdout, _, err := c.GetNode().ExecQuery(ctx, query...)
-	if err != nil {
-		return gjson.Result{}, err
-	}
-	retval := gjson.GetBytes(stdout, jsonPath)
-	if !retval.Exists() {
-		return gjson.Result{}, fmt.Errorf("json path %s not found in query result %s", jsonPath, stdout)
-	}
-	return retval, nil
+func (c *Chain) AssignKey(ctx context.Context, consumerID string, valIndex int, consensusPubKey string) error {
+	_, err := c.Validators[valIndex].ExecTx(ctx, ValidatorMoniker, "provider", "assign-consensus-key", consumerID, consensusPubKey)
+	return err
 }
 
-// GetProposalID parses the proposal ID from the tx; necessary when the proposal type isn't accessible to interchaintest yet
-func (c *Chain) GetProposalID(ctx context.Context, txhash string) (string, error) {
-	stdout, _, err := c.GetNode().ExecQuery(ctx, "tx", txhash)
-	if err != nil {
-		return "", err
-	}
-	result := struct {
-		Events []abcitypes.Event `json:"events"`
-	}{}
-	if err := json.Unmarshal(stdout, &result); err != nil {
-		return "", err
-	}
-	for _, event := range result.Events {
-		if event.Type == "submit_proposal" {
-			for _, attr := range event.Attributes {
-				if string(attr.Key) == "proposal_id" {
-					return string(attr.Value), nil
-				}
-			}
-		}
-	}
-	return "", fmt.Errorf("proposal ID not found in tx %s", txhash)
-}
-
-func (c *Chain) hasOrderingFlag(ctx context.Context) (bool, error) {
-	cmd := c.GetNode().BinCommand("tx", "interchain-accounts", "controller", "register", "--help")
-	stdout, _, err := c.GetNode().Exec(ctx, cmd, nil)
-	if err != nil {
-		return false, err
-	}
-	return strings.Contains(string(stdout), "ordering"), nil
-}
-
-func (c *Chain) GetICAAddress(ctx context.Context, srcAddress string, srcConnection string) string {
-	var icaAddress string
-
-	// it takes a moment for it to be created
-	timeoutCtx, timeoutCancel := context.WithTimeout(ctx, 90*time.Second)
-	defer timeoutCancel()
-	for timeoutCtx.Err() == nil {
-		time.Sleep(5 * time.Second)
-		stdout, _, err := c.GetNode().ExecQuery(timeoutCtx,
-			"interchain-accounts", "controller", "interchain-account",
-			srcAddress, srcConnection,
-		)
-		if err != nil {
-			GetLogger(ctx).Sugar().Warnf("error querying interchain account: %s", err)
-			continue
-		}
-		result := map[string]interface{}{}
-		err = json.Unmarshal(stdout, &result)
-		if err != nil {
-			GetLogger(ctx).Sugar().Warnf("error unmarshalling interchain account: %s", err)
-			continue
-		}
-		icaAddress = result["address"].(string)
-		if icaAddress != "" {
-			break
-		}
-	}
-	return icaAddress
-}
-
-func (c *Chain) SetupICAAccount(ctx context.Context, host *Chain, relayer *Relayer, srcAddress string, valIdx int, initialFunds int64) (string, error) {
-	srcChannel, err := relayer.GetTransferChannel(ctx, c, host)
-	if err != nil {
-		return "", err
-	}
-	srcConnection := srcChannel.ConnectionHops[0]
-
-	hasOrdering, err := c.hasOrderingFlag(ctx)
-	if err != nil {
-		return "", err
-	}
-
-	if hasOrdering {
-		_, err = c.Validators[valIdx].ExecTx(ctx, srcAddress,
-			"interchain-accounts", "controller", "register",
-			"--ordering", "ORDER_ORDERED", "--version", "",
-			srcConnection,
-		)
-	} else {
-		_, err = c.Validators[valIdx].ExecTx(ctx, srcAddress,
-			"interchain-accounts", "controller", "register",
-			srcConnection,
-		)
-	}
-	if err != nil {
-		return "", err
-	}
-
-	icaAddress := c.GetICAAddress(ctx, srcAddress, srcConnection)
-	if icaAddress == "" {
-		return "", fmt.Errorf("ICA address not found")
-	}
-
-	err = host.SendFunds(ctx, interchaintest.FaucetAccountKeyName, ibc.WalletAmount{
-		Denom:   host.Config().Denom,
-		Amount:  sdkmath.NewInt(initialFunds),
-		Address: icaAddress,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	return icaAddress, nil
-}
-
-func (c *Chain) AddLinkedChain(ctx context.Context, testName interchaintest.TestName, relayer *Relayer, spec *interchaintest.ChainSpec) (*Chain, error) {
-	dockerClient, dockerNetwork := GetDockerContext(ctx)
-
-	cf := interchaintest.NewBuiltinChainFactory(
-		GetLogger(ctx),
-		[]*interchaintest.ChainSpec{spec},
+func (c *Chain) ValidatorConsumerAddress(ctx context.Context, consumerID string, providerConsensusAddress string) (ValidatorConsumerAddressResponse, error) {
+	queryRes, _, err := c.GetNode().ExecQuery(
+		ctx,
+		"provider", "validator-consumer-key", consumerID, providerConsensusAddress,
 	)
-
-	chains, err := cf.Chains(testName.Name())
 	if err != nil {
-		return nil, err
+		return ValidatorConsumerAddressResponse{}, err
 	}
-	cosmosChainB := chains[0].(*cosmos.CosmosChain)
-	relayerWallet, err := cosmosChainB.BuildRelayerWallet(ctx, "relayer-"+cosmosChainB.Config().ChainID)
+
+	var queryResponse ValidatorConsumerAddressResponse
+	err = json.Unmarshal([]byte(queryRes), &queryResponse)
 	if err != nil {
-		return nil, err
+		return ValidatorConsumerAddressResponse{}, err
 	}
 
-	ic := interchaintest.NewInterchain().AddChain(cosmosChainB, ibc.WalletAmount{
-		Address: relayerWallet.FormattedAddress(),
-		Denom:   cosmosChainB.Config().Denom,
-		Amount:  sdkmath.NewInt(ValidatorFunds),
-	})
-
-	if err := ic.Build(ctx, GetRelayerExecReporter(ctx), interchaintest.InterchainBuildOptions{
-		Client:    dockerClient,
-		NetworkID: dockerNetwork,
-		TestName:  testName.Name(),
-	}); err != nil {
-		return nil, err
-	}
-
-	chainB, err := chainFromCosmosChain(cosmosChainB, relayerWallet)
-	if err != nil {
-		return nil, err
-	}
-	rep := GetRelayerExecReporter(ctx)
-	if err := relayer.SetupChainKeys(ctx, chainB); err != nil {
-		return nil, err
-	}
-	if err := relayer.StopRelayer(ctx, rep); err != nil {
-		return nil, err
-	}
-	if err := relayer.StartRelayer(ctx, rep); err != nil {
-		return nil, err
-	}
-
-	if err := relayer.GeneratePath(ctx, rep, c.Config().ChainID, chainB.Config().ChainID, relayerTransferPathFor(c, chainB)); err != nil {
-		return nil, err
-	}
-
-	if err := relayer.LinkPath(ctx, rep, relayerTransferPathFor(c, chainB), ibc.CreateChannelOptions{
-		DestPortName:   TransferPortID,
-		SourcePortName: TransferPortID,
-		Order:          ibc.Unordered,
-	}, ibc.DefaultClientOpts()); err != nil {
-		return nil, err
-	}
-
-	return chainB, nil
+	return queryResponse, nil
 }
 
-func (c *Chain) ModifyConfig(ctx context.Context, testName interchaintest.TestName, configChanges map[string]testutil.Toml) error {
-	eg := errgroup.Group{}
-	for _, val := range c.Validators {
-		val := val
-		eg.Go(func() error {
-			for file, changes := range configChanges {
-				if err := testutil.ModifyTomlConfigFile(
-					ctx, GetLogger(ctx),
-					val.DockerClient, testName.Name(), val.VolumeName,
-					file, changes,
-				); err != nil {
-					return err
+func (c *Chain) ValidatorProviderAddress(ctx context.Context, consumerID string, consumerConsensusAddress string) (ValidatorProviderAddressResponse, error) {
+	queryRes, _, err := c.GetNode().ExecQuery(
+		ctx,
+		"provider", "validator-provider-key", consumerID, consumerConsensusAddress,
+	)
+	if err != nil {
+		return ValidatorProviderAddressResponse{}, err
+	}
+
+	var queryResponse ValidatorProviderAddressResponse
+	err = json.Unmarshal([]byte(queryRes), &queryResponse)
+	if err != nil {
+		return ValidatorProviderAddressResponse{}, err
+	}
+
+	return queryResponse, nil
+}
+
+func (c *Chain) ListConsumerChains(ctx context.Context) (ListConsumerChainsResponse, error) {
+	queryRes, _, err := c.GetNode().ExecQuery(
+		ctx,
+		"provider", "list-consumer-chains",
+	)
+	if err != nil {
+		return ListConsumerChainsResponse{}, err
+	}
+
+	var queryResponse ListConsumerChainsResponse
+	err = json.Unmarshal([]byte(queryRes), &queryResponse)
+	if err != nil {
+		return ListConsumerChainsResponse{}, err
+	}
+
+	return queryResponse, nil
+}
+
+func (c *Chain) GetConsumerChain(ctx context.Context, consumerId string) (ConsumerResponse, error) {
+	queryRes, _, err := c.GetNode().ExecQuery(
+		ctx,
+		"provider", "consumer-chain", consumerId,
+	)
+	if err != nil {
+		return ConsumerResponse{}, err
+	}
+
+	var queryResponse ConsumerResponse
+	err = json.Unmarshal([]byte(queryRes), &queryResponse)
+	if err != nil {
+		return ConsumerResponse{}, err
+	}
+
+	return queryResponse, nil
+}
+
+func (c *Chain) GetConsumerGenesis(ctx context.Context, consumerId string) (ConsumerGenesisResponse, error) {
+	queryRes, _, err := c.GetNode().ExecQuery(
+		ctx,
+		"provider", "consumer-genesis", consumerId,
+	)
+	if err != nil {
+		return ConsumerGenesisResponse{}, err
+	}
+
+	var queryResponse ConsumerGenesisResponse
+	err = json.Unmarshal([]byte(queryRes), &queryResponse)
+	if err != nil {
+		return ConsumerGenesisResponse{}, err
+	}
+
+	return queryResponse, nil
+}
+
+func (c *Chain) GetConsumerChainByChainId(ctx context.Context, chainId string) (ConsumerChain, error) {
+	chains, err := c.ListConsumerChains(ctx)
+	if err != nil {
+		return ConsumerChain{}, err
+	}
+
+	for _, chain := range chains.Chains {
+		if chain.ChainID == chainId {
+			return chain, nil
+		}
+	}
+	return ConsumerChain{}, fmt.Errorf("chain not found")
+}
+
+func (c *Chain) GetOptInValidators(ctx context.Context, consumerId string) (OptInValidatorsResponse, error) {
+	queryRes, _, err := c.GetNode().ExecQuery(
+		ctx,
+		"provider", "consumer-opted-in-validators", consumerId,
+	)
+	if err != nil {
+		return OptInValidatorsResponse{}, err
+	}
+
+	var queryResponse OptInValidatorsResponse
+	err = json.Unmarshal([]byte(queryRes), &queryResponse)
+	if err != nil {
+		return OptInValidatorsResponse{}, err
+	}
+
+	return queryResponse, nil
+}
+
+func (c *Chain) GetValidatorConsAddress(ctx context.Context, validatorIndex int) (string, error) {
+	queryRes, _, err := c.Validators[validatorIndex].ExecBin(
+		ctx,
+		"comet", "show-address",
+	)
+	if err != nil {
+		return "", err
+	}
+
+	address := strings.TrimSpace(string(queryRes))
+
+	return address, nil
+}
+
+func (c *Chain) GetValidatorKey(ctx context.Context, validatorIndex int) (string, error) {
+	queryRes, _, err := c.Validators[validatorIndex].ExecBin(
+		ctx,
+		"comet", "show-validator",
+	)
+	if err != nil {
+		return "", err
+	}
+
+	address := strings.TrimSpace(string(queryRes))
+
+	return address, nil
+}
+
+func getEvtAttribute(events []abci.Event, evtType string, key string) (string, bool) {
+	for _, evt := range events {
+		if evt.GetType() == evtType {
+			for _, attr := range evt.Attributes {
+				if attr.Key == key {
+					return attr.Value, true
 				}
 			}
-			if err := val.StopContainer(ctx); err != nil {
-				return err
-			}
-			return val.StartContainer(ctx)
-		})
+		}
 	}
-	if err := eg.Wait(); err != nil {
-		return err
-	}
-	return nil
+
+	return "", false
 }

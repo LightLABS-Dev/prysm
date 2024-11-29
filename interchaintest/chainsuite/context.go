@@ -39,11 +39,6 @@ func WithTestReporter(ctx context.Context, r *testreporter.Reporter) context.Con
 	return context.WithValue(ctx, testReporterKey{}, r)
 }
 
-func GetTestReporter(ctx context.Context) *testreporter.Reporter {
-	r, _ := ctx.Value(testReporterKey{}).(*testreporter.Reporter)
-	return r
-}
-
 func WithRelayerExecReporter(ctx context.Context, r *testreporter.RelayerExecReporter) context.Context {
 	return context.WithValue(ctx, relayerExecReporterKey{}, r)
 }
