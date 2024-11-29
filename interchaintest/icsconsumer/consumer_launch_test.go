@@ -24,8 +24,7 @@ func TestICS6Consumer(t *testing.T) {
 		Suite: chainsuite.NewSuite(chainsuite.SuiteConfig{
 			CreateRelayer: true,
 			ChainSpec: &interchaintest.ChainSpec{
-				// Two or Six. uses less as determinism would be caught upstream
-				NumValidators: &chainsuite.TwoValidators,
+				NumValidators: &chainsuite.SixValidators,
 				ChainConfig:   e2e.DefaultChainConfig,
 			},
 		}),

@@ -262,6 +262,10 @@ ictest-ics:
 	@echo "Running ICS e2e test"
 	@cd interchaintest && go test -race -v -run TestICSProviderSuite ./integration
 
+ictest-icsconsumer:
+	@echo "Running ICS Consumer e2e test"
+	@cd interchaintest && go test -race -v -run TestICS6Consumer ./icsconsumer
+
 ictest-wasm:
 	@echo "Running Cosmwasm e2e test"
 	@cd interchaintest && go test -race -v -run TestCosmWasmIntegration .

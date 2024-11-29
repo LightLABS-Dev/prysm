@@ -26,8 +26,6 @@ import (
 )
 
 var (
-	VotingPeriod           = "15s"
-	MaxDepositPeriod       = "10s"
 	ProviderSlashingWindow = 10
 	DowntimeJailDuration   = 10 * time.Second
 	CommitTimeout          = 4 * time.Second

@@ -83,7 +83,8 @@ jobs:
           - "ictest-packetforward"
           - "ictest-tokenfactory"
           - "ictest-ratelimit"
-          - "ictest-ics"
+          - "ictest-ics" # direct provider integration verifiction
+          - "ictest-icsconsumer" # Consumer<>Provider actual
       fail-fast: false
 
     steps:
