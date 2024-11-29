@@ -10,25 +10,23 @@ replace (
 	github.com/ChainSafe/go-schnorrkel => github.com/ChainSafe/go-schnorrkel v0.0.0-20200405005733-88cbf1b4c40d
 	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
 	github.com/btcsuite/btcd => github.com/btcsuite/btcd v0.22.2 //indirect
-	github.com/cosmos/interchain-security/v5 => github.com/cosmos/interchain-security/v5 v5.0.0-20240905162918-300530f18130 // https://github.com/strangelove-ventures/interchaintest/pull/1236/files
+
+	github.com/btcsuite/btcd/btcec/v2 => github.com/btcsuite/btcd/btcec/v2 v2.3.3
+
+	// github.com/cosmos/interchain-security/v5 => github.com/cosmos/interchain-security/v5 v5.0.0-20240905162918-300530f18130 // https://github.com/strangelove-ventures/interchaintest/pull/1236/files
 
 	// If using custom internal modules, replace your app here with the parent application
 	// github.com/lightlabs-dev/prysm => ../.
-
-	github.com/docker/distribution => github.com/docker/distribution v2.8.2+incompatible
-	github.com/docker/docker => github.com/docker/docker v24.0.9+incompatible
-	github.com/ethereum/go-ethereum => github.com/ethereum/go-ethereum v1.14.5 // indirect
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-
 	// breaks SDK app.toml parsing for client configs.
 	github.com/spf13/viper => github.com/spf13/viper v1.17.0
 
-	// consumer proposal fix
-	// https://github.com/strangelove-ventures/interchaintest/pull/1236/files
-	// + fix for failure when running app in HasCommand false
+	// https://github.com/strangelove-ventures/interchaintest/pull/1236/files / // https://github.com/cosmos/interchain-security/blob/main/tests/interchain/go.mod#L280
 	// github.com/strangelove-ventures/interchaintest/v8 => github.com/hyphacoop/interchaintest/v8 v8.2.1-0.20240904201357-3a54d751e08d
-	github.com/strangelove-ventures/interchaintest/v8 => github.com/stana-miric/interchaintest/v8 v8.0.0-20241022073631-60f2480aacd4 // https://github.com/cosmos/interchain-security/blob/main/tests/interchain/go.mod#L280
+	github.com/strangelove-ventures/interchaintest/v8 => github.com/stana-miric/interchaintest/v8 v8.0.0-20241022073631-60f2480aacd4
 	// github.com/strangelove-ventures/interchaintest/v8 => /home/reece/Desktop/Programming/Go/interchaintest
+
+	// other
 	github.com/vedhavyas/go-subkey => github.com/strangelove-ventures/go-subkey v1.0.7
 )
 
@@ -38,27 +36,19 @@ require (
 	github.com/cometbft/cometbft v0.38.15
 	github.com/cosmos/cosmos-sdk v0.50.9
 	github.com/cosmos/ibc-go/v8 v8.5.2
-	github.com/cosmos/interchain-security/v5 v5.0.0-alpha1.0.20240424193412-7cd900ad2a74
+	github.com/cosmos/interchain-security/v6 v6.3.0
 	github.com/docker/docker v24.0.9+incompatible
-	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/strangelove-ventures/interchaintest/v8 v8.8.0
 	github.com/strangelove-ventures/tokenfactory v0.50.3
 	github.com/stretchr/testify v1.9.0
-	github.com/tidwall/gjson v1.18.0
-	github.com/tidwall/sjson v1.2.5
-	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/mod v0.21.0
 	golang.org/x/sync v0.8.0
 )
 
 require (
+	cloud.google.com/go v0.115.0 // indirect
 	cloud.google.com/go/auth v0.6.0 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.2 // indirect
-)
-
-require (
-	cloud.google.com/go v0.115.0 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	cloud.google.com/go/iam v1.1.9 // indirect
 	cloud.google.com/go/storage v1.41.0 // indirect
@@ -116,7 +106,6 @@ require (
 	github.com/cosmos/iavl v1.1.2 // indirect
 	github.com/cosmos/ibc-go/modules/capability v1.0.1 // indirect
 	github.com/cosmos/ics23/go v0.11.0 // indirect
-	github.com/cosmos/interchain-security/v6 v6.1.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.13.3 // indirect
 	github.com/crate-crypto/go-kzg-4844 v1.0.0 // indirect
 	github.com/danieljoos/wincred v1.2.0 // indirect
@@ -262,6 +251,7 @@ require (
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/tidwall/btree v1.7.0 // indirect
+	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/tklauser/go-sysconf v0.3.12 // indirect
@@ -278,8 +268,10 @@ require (
 	go.opentelemetry.io/otel v1.24.0 // indirect
 	go.opentelemetry.io/otel/metric v1.24.0 // indirect
 	go.opentelemetry.io/otel/trace v1.24.0 // indirect
+	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/crypto v0.28.0 // indirect
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8 // indirect
+	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.30.0 // indirect
 	golang.org/x/oauth2 v0.23.0 // indirect
 	golang.org/x/sys v0.26.0 // indirect

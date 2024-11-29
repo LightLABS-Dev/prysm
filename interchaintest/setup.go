@@ -19,7 +19,7 @@ import (
 
 	wasm "github.com/CosmWasm/wasmd/x/wasm/types"
 	ibcconntypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
-	providertypes "github.com/cosmos/interchain-security/v5/x/ccv/provider/types"
+	providertypes "github.com/cosmos/interchain-security/v6/x/ccv/provider/types"
 	tokenfactory "github.com/strangelove-ventures/tokenfactory/x/tokenfactory/types"
 )
 
