@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 	"sync"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -134,7 +133,7 @@ import (
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	wasmvm "github.com/CosmWasm/wasmvm"
+	wasmvm2 "github.com/CosmWasm/wasmvm/v2"
 
 	wasmlc "github.com/cosmos/ibc-go/modules/light-clients/08-wasm"
 	wasmlckeeper "github.com/cosmos/ibc-go/modules/light-clients/08-wasm/keeper"
@@ -171,14 +170,13 @@ const (
 )
 
 var (
-	capabilities = strings.Join(
-		[]string{
-			"iterator",
-			"staking",
-			"stargate",
-			"cosmwasm_1_1", "cosmwasm_1_2", "cosmwasm_1_3", "cosmwasm_1_4",
-			"token_factory",
-		}, ",")
+	capabilities = []string{
+		"iterator",
+		"staking",
+		"stargate",
+		"cosmwasm_1_1", "cosmwasm_1_2", "cosmwasm_1_3", "cosmwasm_1_4",
+		"token_factory",
+	}
 )
 
 // These constants are derived from the above variables.
@@ -793,7 +791,7 @@ func NewChainApp(
 		app.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
-		strings.Join(AllCapabilities(), ","),
+		AllCapabilities(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		wasmOpts...,
 	)
@@ -814,7 +812,7 @@ func NewChainApp(
 	dataDir := filepath.Join(homePath, "data")
 
 	var memCacheSizeMB uint32 = 100
-	lc08, err := wasmvm.NewVM(filepath.Join(dataDir, "08-light-client"), capabilities, 32, false, memCacheSizeMB)
+	lc08, err := wasmvm2.NewVM(filepath.Join(dataDir, "08-light-client"), capabilities, 32, false, memCacheSizeMB)
 	if err != nil {
 		panic(fmt.Sprintf("failed to create VM for 08 light client: %s", err))
 	}

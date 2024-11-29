@@ -28,7 +28,7 @@ var ccvSuite *integration.CCVTestSuite
 var app *prysmapp.ChainApp
 
 func init() {
-	// Pass in concrete app types that implement the interfaces defined in https://github.com/cosmos/interchain-security/testutil/integration/interfaces.go
+	// Pass in concrete app types that implement the interfaces.
 	// IMPORTANT: the concrete app types passed in as type parameters here must match the
 	// concrete app types returned by the relevant app initers.
 	ccvSuite = integration.NewCCVTestSuite[*prysmapp.ChainApp, *appConsumer.App](AppIniterTempDir, icstestingutils.ConsumerAppIniter, []string{})
