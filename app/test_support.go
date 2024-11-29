@@ -11,6 +11,11 @@ import (
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	ibcproviderkeeper "github.com/cosmos/interchain-security/v6/x/ccv/provider/keeper"
+
+	"github.com/cosmos/cosmos-sdk/client"
+	ibctestingtypes "github.com/cosmos/ibc-go/v8/testing/types"
+	icstest "github.com/cosmos/interchain-security/v6/testutil/integration"
+	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 )
 
 func (app *ChainApp) GetProviderKeeper() ibcproviderkeeper.Keeper {
@@ -33,7 +38,11 @@ func (app *ChainApp) GetBankKeeper() bankkeeper.Keeper {
 	return app.BankKeeper
 }
 
-func (app *ChainApp) GetStakingKeeper() *stakingkeeper.Keeper {
+func (app *ChainApp) GetAppStakingKeeper() *stakingkeeper.Keeper {
+	return app.StakingKeeper
+}
+
+func (app *ChainApp) GetStakingKeeper() ibctestingtypes.StakingKeeper {
 	return app.StakingKeeper
 }
 
@@ -43,4 +52,38 @@ func (app *ChainApp) GetAccountKeeper() authkeeper.AccountKeeper {
 
 func (app *ChainApp) GetWasmKeeper() wasmkeeper.Keeper {
 	return app.WasmKeeper
+}
+
+// GetTxConfig implements the TestingApp interface.
+func (app *ChainApp) GetTxConfig() client.TxConfig {
+	return app.txConfig
+}
+
+// GetTestStakingKeeper implements the ProviderApp interface.
+func (app *ChainApp) GetTestStakingKeeper() icstest.TestStakingKeeper { //nolint:nolintlint
+	return app.StakingKeeper
+}
+
+// GetTestBankKeeper implements the ProviderApp interface.
+func (app *ChainApp) GetTestBankKeeper() icstest.TestBankKeeper { //nolint:nolintlint
+	return app.BankKeeper
+}
+
+// GetTestSlashingKeeper implements the ProviderApp interface.
+func (app *ChainApp) GetTestSlashingKeeper() icstest.TestSlashingKeeper { //nolint:nolintlint
+	return app.SlashingKeeper
+}
+
+// GetTestDistributionKeeper implements the ProviderApp interface.
+func (app *ChainApp) GetTestDistributionKeeper() icstest.TestDistributionKeeper { //nolint:nolintlint
+	return app.DistrKeeper
+}
+
+func (app *ChainApp) GetTestAccountKeeper() icstest.TestAccountKeeper { //nolint:nolintlint
+	return app.AccountKeeper
+}
+
+// GetTestGovKeeper implements the TestingApp interface.
+func (app *ChainApp) GetTestGovKeeper() *govkeeper.Keeper {
+	return app.GovKeeper
 }
